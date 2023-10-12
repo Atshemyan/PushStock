@@ -42,13 +42,7 @@ To successfully build and run the program, ensure you have the following require
    - If you're a new user, click on `register` to create an account. If you're an existing user, click on `login`.
    - After logging in, use the GUI to navigate through the various features like viewing the graph, buying/selling cryptocurrencies, depositing funds, etc.
 
-## Disclaimer
-
-This program is for educational and emulation purposes only. The cryptocurrencies mentioned are virtual and have no real-world value. Please use responsibly.
-
-
-
-### 🚀 Getting Started
+## 🚀 Getting Started
 
 1. **Initial Landing Page**:
     - As a first-time user, you will be presented with two choices: *Login* or *Register*.
@@ -68,7 +62,7 @@ This program is for educational and emulation purposes only. The cryptocurrencie
 
 ---
 
-### 📈 Stock Management
+## 📈 Stock Management
 
 - **Accounts & Balances**:
     - View your balance in USD as well as in specific coins like VHUK, HKE, NARSMOKE, and VOYL.
@@ -92,6 +86,8 @@ This program is for educational and emulation purposes only. The cryptocurrencie
     - On the bottom left, you can track the latest transactions executed by you and other users of PushStock.
     - The feed has space for up to 20 transactions. As new transactions come in, the oldest will be replaced, ensuring you always have the most recent data without an overwhelming list.
 
+## Disclaimer
+This program is for educational and emulation purposes only. The cryptocurrencies mentioned are virtual and have no real-world value. Please use responsibly.
 ---
 
 Thank you for choosing **PushStock** for your stock management needs. Happy trading! 📊🚀
