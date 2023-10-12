@@ -1,11 +1,9 @@
----
+### 📌 Introduction
 
-## Introduction
+PushStock is a modern stock management platform built using C++ and the Qt framework, designed to offer users an intuitive interface to track, manage, and trade in various cryptocurrencies.
 This program allows users to work with virtual stocks and cryptocurrencies. It supports four custom cryptocurrencies: VHUK, HKE, VOYL, and NARSMOKE. The value of these cryptocurrencies is updated every second and is stored on a server. This program has a graphical user interface (GUI) that lets users register, login, view graphs of cryptocurrency values, manage their balance, buy/sell cryptocurrencies, and more.
 
----
-
-### 📌 Requirements
+## Requirements
 
 To successfully build and run the program, ensure you have the following requirements:
 
