@@ -86,6 +86,7 @@ To successfully build and run the program, ensure you have the following require
 - **Transactions Feed**:
     - On the bottom left, you can track the latest transactions executed by you and other users of PushStock.
     - The feed has space for up to 20 transactions. As new transactions come in, the oldest will be replaced, ensuring you always have the most recent data without an overwhelming list.
+---
 
 ## Disclaimer
 This program is for educational and emulation purposes only. The cryptocurrencies mentioned are virtual and have no real-world value. Please use responsibly.
