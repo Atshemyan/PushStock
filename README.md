@@ -1,12 +1,56 @@
-**PushStock README.md**
-
 ---
 
 ### 📌 Introduction
 
 **PushStock** is a modern stock management platform built using C++ and the Qt framework, designed to offer users an intuitive interface to track, manage, and trade in various cryptocurrencies.
+This program allows users to work with virtual stocks and cryptocurrencies. It supports four custom cryptocurrencies: VHUK, HKE, VOYL, and NARSMOKE. The value of these cryptocurrencies is updated every second and is stored on a server. This program has a graphical user interface (GUI) that lets users register, login, view graphs of cryptocurrency values, manage their balance, buy/sell cryptocurrencies, and more.
 
 ---
+
+## Requirements
+
+To successfully build and run the program, ensure you have the following requirements:
+
+- Qt version 3.5 or higher.
+- QChart module.
+- Qt Designer for building the user interface.
+
+
+## Features
+
+1. **User Registration and Login**: New users must first register to create an account. Once registered, they can login to access the main functionalities of the app.
+  
+2. **Real-time Value Graph**: Upon logging in, users are greeted with a graph displaying the value of one of the cryptocurrencies. Users can switch between different cryptocurrencies using the change button.
+
+3. **Buy/Sell Cryptocurrencies**: Users can buy or sell the currently displayed cryptocurrency. Transactions are logged and displayed in the interface.
+
+4. **Balance Management**: Users can check their current balance and deposit funds using the deposit button.
+
+5. **Transaction Log**: The application displays all transactions made by the users.
+
+6. **Logout Feature**: Users can safely logout of the application using the exit button.
+
+## How to Build and Run
+
+1. **Setting up the environment**: 
+   - Ensure you have the required version of Qt, QChart, and Qt Designer installed.
+   - Clone the repository or download the source code.
+
+2. **Building with Qt Designer**:
+   - Open the main project file with Qt Designer.
+   - Go to `Build` > `Build Project`.
+   - Once the build is successful, you can run the application.
+
+3. **Using the application**:
+   - Start the program.
+   - If you're a new user, click on `register` to create an account. If you're an existing user, click on `login`.
+   - After logging in, use the GUI to navigate through the various features like viewing the graph, buying/selling cryptocurrencies, depositing funds, etc.
+
+## Disclaimer
+
+This program is for educational and emulation purposes only. The cryptocurrencies mentioned are virtual and have no real-world value. Please use responsibly.
+
+
 
 ### 🚀 Getting Started
 
