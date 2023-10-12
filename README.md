@@ -42,6 +42,7 @@ To successfully build and run the program, ensure you have the following require
    - If you're a new user, click on `register` to create an account. If you're an existing user, click on `login`.
    - After logging in, use the GUI to navigate through the various features like viewing the graph, buying/selling cryptocurrencies, depositing funds, etc.
 
+---
 ## 🚀 Getting Started
 
 1. **Initial Landing Page**:
