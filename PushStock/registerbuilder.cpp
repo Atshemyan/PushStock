@@ -20,7 +20,7 @@ void RegisterBuilder::sendCommandToServer()
     command += m_surname + ';';
     command += m_mail + ';';
     command += m_phone + ';';
-    command += decrypt(m_password) + ';';
+    command += std::to_string(decrypt(m_password)) + ';';
 
     Server::getInstance().sendCommandToServer(command);
 }
