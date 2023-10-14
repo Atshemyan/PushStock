@@ -16,22 +16,51 @@ void LoginPage::loginButtonConnect()
 {
     QObject::connect(m_btnLogin, &QPushButton::clicked, [&]()
     {
-        Server::getInstance().createSocket();
-        Server::getInstance().connectToServer();
-        LoginBuilder(m_txtUser->text().toStdString(), m_txtPassword->text().toStdString());
-        if (Server::getInstance().responseFromServer() == "OK")
+        EmailValidator mailValidator;
+        PasswordValidator passwordValidator;
+        m_txtUser->setValidator(&mailValidator);
+        m_txtPassword->setValidator(&passwordValidator);
+
+        // Use non-temporary QString variables for validation
+        QString mail = m_txtUser->text();
+        QString password = m_txtPassword->text();
+
+        int pos {};
+        bool validState {true};
+
+        if (m_txtUser->validator()->validate(mail, pos) != QValidator::Acceptable)
         {
-            //showing stockPage
-            m_stockPage = new StockPage(this, m_txtUser->text().toStdString());
-            m_stockPage->show();
+            m_txtUser->setStyleSheet("border: 1px solid red;");
+            validState = false;
+        }
+        if (m_txtPassword->validator()->validate(password, pos) != QValidator::Acceptable)
+        {
+            m_txtPassword->setStyleSheet("border: 1px solid red;");
+            validState = false;
+        }
+        if (validState)
+        {
+            Server::getInstance().createSocket();
+            Server::getInstance().connectToServer();
+            LoginBuilder(m_txtUser->text().toStdString(), m_txtPassword->text().toStdString());
+            if (Server::getInstance().responseFromServer() == "OK")
+            {
+                //showing stockPage
+                m_stockPage = new StockPage(this, m_txtUser->text().toStdString());
+                m_stockPage->show();
+            }
+            else
+            {
+                m_txtUser->setStyleSheet("border: 1px solid red;");
+                m_txtPassword->setStyleSheet("border: 1px solid red;");
+            }
+
+            Server::getInstance().closeSocket();
         }
         else
         {
-            m_txtUser->setStyleSheet("border: 1px solid red;");
-            m_txtPassword->setStyleSheet("border: 1px solid red;");
+            m_btnLogin->setStyleSheet("background-color: red; color: white;");  // Set button to red when declined.
         }
-
-        Server::getInstance().closeSocket();
     });
 
 }
