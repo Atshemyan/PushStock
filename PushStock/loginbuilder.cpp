@@ -13,6 +13,6 @@ void LoginBuilder::sendCommandToServer()
 {
     std::string command = "LOGIN;";
     command += m_username + ';';
-    command += decrypt(m_password) + ';';
+    command += std::to_string(decrypt(m_password)) + ';';
     Server::getInstance().sendCommandToServer(command);
 }
