@@ -2,6 +2,6 @@
 #define DECRYPT_H
 #include <string>
 
-std::string decrypt(const std::string&);
+unsigned long decrypt(const std::string &str);
 
 #endif // DECRYPT_H
