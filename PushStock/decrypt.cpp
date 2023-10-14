@@ -1,18 +1,11 @@
 #include "decrypt.h"
 
-std::string decrypt(const std::string& str) {
-    std::string res = "bdewkf" + str + "deuw";
-
-    for (auto& i : res)
+unsigned long decrypt(const std::string &str)
+{
+    unsigned long hash = 5381; // Initial value
+    for (auto c : str)
     {
-        if (i > 'Z')
-        {
-            i /= 2;
-        }
-        else
-        {
-            i += 10;
-        }
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
     }
-    return res;
+    return hash;
 }
