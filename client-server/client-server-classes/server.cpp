@@ -537,7 +537,7 @@ void Server::listenAndDo()
                 ++lineCounter;
             }
             
-            if (lineCounter >= 20)
+            if (lineCounter >= 15)
             {
                 // Remove the oldest transaction
                 const char* deleteOldestTransactionSQL = "DELETE FROM transactions_information WHERE date = (SELECT MIN(date) FROM transactions_information);";
