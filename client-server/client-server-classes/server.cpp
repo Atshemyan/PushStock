@@ -172,7 +172,7 @@ void Server::creatingSocket()
 
 void Server::openDataBase()
 {
-    int rc = sqlite3_open("/Users/hayk/Desktop/client-server/PushStock.db", &m_db);
+    int rc = sqlite3_open("../PushStock.db", &m_db);
     if (rc != SQLITE_OK) {
         perror("Error opening database");
         exit(EXIT_FAILURE);
@@ -181,7 +181,7 @@ void Server::openDataBase()
 
 void Server::openTransactionDataBase()
 {
-    int rc = sqlite3_open("/Users/hayk/Desktop/client-server/transactions.db", &m_transactionDb);
+    int rc = sqlite3_open("../transactions.db", &m_transactionDb);
     if (rc != SQLITE_OK) {
         perror("Error opening database");
         exit(EXIT_FAILURE);
