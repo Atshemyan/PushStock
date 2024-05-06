@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
     MainWindow mainWindow;
-    mainWindow.setFixedSize(1920, 1080);
+    mainWindow.setFixedSize(2560, 1664);
     mainWindow.showMaximized();
     return app.exec();
 }
