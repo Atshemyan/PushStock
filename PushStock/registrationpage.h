@@ -19,7 +19,7 @@
 class RegistrationPage : public QWidget
 {
 public:
-    RegistrationPage(QWidget *parent = nullptr);
+    RegistrationPage(QWidget *parent = nullptr, uint languageIndex = 0);
 private:
     QLineEdit *m_txtName {};
     QLineEdit *m_txtSurname {};
@@ -29,6 +29,7 @@ private:
     QPushButton *m_btnBack {};
     QPushButton *m_btnReg {};
     QSize m_size = parentWidget()->size();
+    uint m_languageIndex = 0;
 
     void pageHeader();
     void pageLogo();

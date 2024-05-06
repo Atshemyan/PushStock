@@ -1,8 +1,9 @@
 #include "loginpage.h"
 #include "server.h"
 
-LoginPage::LoginPage(QWidget *parent)
+LoginPage::LoginPage(QWidget *parent, uint languageIndex)
     : QWidget(parent)
+    , m_languageIndex {languageIndex}
 {
     this->setGeometry(0, 0, m_parentSize.width(), m_parentSize.height());
 
@@ -44,7 +45,7 @@ void LoginPage::loginButtonConnect()
             LoginBuilder(m_txtUser->text().toStdString(), m_txtPassword->text().toStdString());
             if (Server::getInstance().responseFromServer() == "OK")
             {
-                m_stockPage = new StockPage(this, m_txtUser->text().toStdString());
+                m_stockPage = new StockPage(this, m_txtUser->text().toStdString(), m_languageIndex);
                 m_stockPage->show();
             }
             else
@@ -69,7 +70,13 @@ void LoginPage::pageHeader()
     m_topLabel->setGeometry(10, 10, m_parentSize.width(), 30);
 
     m_btnBack = new QPushButton(m_topLabel);
-    m_btnBack->setText("← Back");
+    if (m_languageIndex == 0) {
+        m_btnBack->setText("← Հետ");
+    }
+    else {
+        m_btnBack->setText("← Back");
+    }
+
     m_btnBack->setStyleSheet("QPushButton { background: transparent; color: white; }"
                             "QPushButton:hover { color: rgb(241, 180, 41); }");
     m_btnBack->setGeometry(0, 0, 65, 30);
@@ -93,15 +100,17 @@ void LoginPage::pageLogin()
     QLabel *textLabel = new QLabel(this);
 
     QLabel *userLabel= new QLabel(textLabel);
-    userLabel->setText("e-mail:");
+    userLabel->setText(m_languageIndex == 0 ? "էլ-հասցե" : "e-mail");
+
     QLabel *passwordLabel = new QLabel(textLabel);
-    passwordLabel->setText("password:");
+    passwordLabel->setText(m_languageIndex == 0 ? "գաղտնաբառ" : "password");
+
 
     m_txtUser = new QLineEdit(textLabel);
     m_txtUser->setFocus();
     m_txtPassword = new QLineEdit(textLabel);
     m_btnLogin = new QPushButton(textLabel);
-    m_btnLogin->setText("Login →");
+    m_btnLogin->setText(!m_languageIndex ? "Մուտք →" : "Login →");
     m_btnLogin->setStyleSheet("QPushButton { background: transparent; color: white; }"
                              "QPushButton:hover { color: rgb(241, 180, 41); }");
 
