@@ -22,3 +22,4 @@ QValidator::State DepositValidator::validate(QString& input, int& pos) const
     }
     return QValidator::Invalid;
 }
+

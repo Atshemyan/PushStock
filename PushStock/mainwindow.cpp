@@ -62,6 +62,7 @@ void MainWindow::initButtons()
 void MainWindow::setDarkTheme()
 {
     this->setStyleSheet(
+
         "QWidget { background-color: black; color: white; }"
         "QLabel { color: white; }"
         "QLineEdit { background-color: #333; color: white; border: 2px solid #555; border-radius: 5px; }"

@@ -6,7 +6,6 @@ StockPage::StockPage(QWidget *parent, const std::string& username)
 {
     m_size = parentWidget()->size();
     this->setGeometry(0, 0, m_size.width(), m_size.height());
-
     this->initTopLabel();
     this->moneyShow();
     this->initStockLabel();
@@ -152,6 +151,12 @@ void StockPage::settingCoinPrice()
     Server::getInstance().connectToServer();
     Server::getInstance().sendCommandToServer("GET" + m_coinsSelection->currentText().toStdString() + "PRICE;");
     std::string response = Server::getInstance().responseFromServer();
+    // std::string response = "1";
+
+    if (response.empty()) {
+        Server::getInstance().closeSocket();
+        return;
+    }
     this->removeDots(response);
     double tmpPrice = std::stod(response);
     if (tmpPrice > m_prevPriceOfCoin)
@@ -189,15 +194,8 @@ void StockPage::settingCoinPrice()
 
 void StockPage::priceGraphic()
 {
-    this->settingCoinPrice();
-    QTimer *coinMoneyTimer = new QTimer(this);
-    connect(coinMoneyTimer, &QTimer::timeout, [=]()
-    {
-        this->settingCoinPrice();
-
-    });
-
-    coinMoneyTimer->start(1000);
+    connect(m_priceThread, &CoinPriceThread::updatePrice, this, &StockPage::settingCoinPrice);
+    m_priceThread->continueThread(); // as start
 }
 
 void StockPage::initExitButton()
@@ -280,10 +278,9 @@ void StockPage::coinSelection()
     m_coinsSelection->setGeometry(20, 12, 100, 40);
     m_coinsSelection->setFont(QFont("Arial", 18));
 
-    m_coinsSelection->addItem("VHUK");
-    m_coinsSelection->addItem("HKE");
-    m_coinsSelection->addItem("NARSMOKE");
-    m_coinsSelection->addItem("VOYL");
+    m_coinsSelection->addItem("BTC");
+    m_coinsSelection->addItem("ETH");
+    m_coinsSelection->addItem("BNB");
 
 }
 
@@ -348,7 +345,19 @@ void StockPage::updateChart(std::string& response)
     }
 
     m_priceChart->axes(Qt::Horizontal).first()->setRange(currentTime.addSecs(-100).toMSecsSinceEpoch(), currentTime.toMSecsSinceEpoch());
-    m_priceChart->axes(Qt::Vertical).first()->setRange(0, 2500);
+
+    if (m_firstTime) {
+        m_minValueOfChart = price - 40;
+        m_maxValueOfChart = price + 40;
+        m_firstTime = false;
+    }
+
+    else if (abs(price - m_maxValueOfChart) <= 10 || abs(price - m_minValueOfChart) <= 10) {
+        m_minValueOfChart = price - 40;
+        m_maxValueOfChart = price + 40;
+    }
+
+    m_priceChart->axes(Qt::Vertical).first()->setRange(m_minValueOfChart, m_maxValueOfChart);
 
     m_priceChart->axes(Qt::Horizontal).first()->setLabelsVisible(false);
     m_priceChart->update();
@@ -372,6 +381,15 @@ void StockPage::resetChart()
 {
     // Clear the series data
     m_priceSeries->clear();
+
+    Server::getInstance().createSocket();
+    Server::getInstance().connectToServer();
+    Server::getInstance().sendCommandToServer("GET" + m_coinsSelection->currentText().toStdString() + "PRICE;");
+
+    double price = std::stod(Server::getInstance().responseFromServer());
+
+    m_minValueOfChart = price - 40;
+    m_maxValueOfChart = price + 40;
 
     // Reset the horizontal axis range
     QDateTime currentTime = QDateTime::currentDateTime();

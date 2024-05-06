@@ -20,8 +20,10 @@ public:
     void connectToServer();
     void sendCommandToServer(const std::string& command);
     void closeSocket();
+    int getSocket() const;
     std::string responseFromServer();
     std::string getMoney(const std::string& username);
+
 
 private:
     Server();

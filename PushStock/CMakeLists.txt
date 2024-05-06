@@ -43,6 +43,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         decrypt.cpp
         depositvalidator.h depositvalidator.cpp
         imagerecourses.qrc
+        coinpricethread.h coinpricethread.cpp
 
 
     )

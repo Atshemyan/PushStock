@@ -10,6 +10,8 @@
 #include <QStackedWidget>
 #include <QPushButton>
 #include <QMessageBox>
+#include "emailvalidator.h"
+#include "passwordvalidator.h"
 #include "stockpage.h"
 #include "loginbuilder.h"
 
@@ -32,8 +34,6 @@ private:
     void pageLogo();
     void pageLogin();
     void loginButtonConnect();
-
-
 
 };
 

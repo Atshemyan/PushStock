@@ -10,7 +10,6 @@
 #include <vector>
 #include <string>
 #include <ctime>
-#include "coin.hpp"
 class Server
 {
 public:
@@ -32,10 +31,15 @@ private:
     sqlite3 *m_transactionDb;
     std::atomic<bool> m_shouldTerminate {};
     std::thread m_updateThread;
-    std::vector<Coin*> m_coinVec { new Vhuk, new Hke, new NarSmoke, new Voyl };
+    std::string m_btcPrice;
+    std::string m_ethPrice;
+    std::string m_bnbPrice;
+
+
     void updateAllCoins();
+    void updateLocalCoinPrices();
     double getMoneyFromDB(const std::string& mail, sqlite3 *db);
     void setMoneyToDB(double newMoney, const std::string& mail, sqlite3 *db);
-    void updateCoinSlot(const std::string& username, sqlite3 *db, const std::string& coinName, double num, int index);
+    void updateCoinSlot(const std::string& username, sqlite3 *db, const std::string& coinName, double num);
     double getCoinCount(const std::string& username, sqlite3* db, const std::string& coinName);
 };

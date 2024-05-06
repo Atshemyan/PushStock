@@ -19,9 +19,8 @@ void Server::createSocket()
 
 void Server::connectToServer()
 {
-    // Connect to the server
     m_serverAddr.sin_family = AF_INET;
-    m_serverAddr.sin_port = htons(7777); // Use the same port as the server
+    m_serverAddr.sin_port = htons(4444);
     m_serverAddr.sin_addr.s_addr = INADDR_ANY;
     //    m_serverAddr.sin_addr.s_addr = inet_addr("192.313.123");
 
@@ -50,6 +49,10 @@ std::string Server::responseFromServer()
 
     return std::string(buffer);
 
+}
+
+int Server::getSocket() const {
+    return m_clientSocket;
 }
 
 std::string Server::getMoney(const std::string& username)

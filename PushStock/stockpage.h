@@ -25,13 +25,13 @@
 #include <string>
 #include "depositpage.h"
 #include "server.h"
+#include "coinpricethread.h"
 
 class StockPage : public QWidget
 {
 
 public:
     StockPage(QWidget *parent = nullptr, const std::string& username = "NONE");
-
 private:
     QComboBox *m_coinsSelection {};
     QLabel *m_moneyToShow {};
@@ -54,9 +54,14 @@ private:
     QLabel *m_coinPrice {};
     QSet<QString> m_existingItemsInList;
     QSize m_size {};
+    CoinPriceThread *m_priceThread {new CoinPriceThread};
+    int m_maxValueOfChart = 0;
+    int m_minValueOfChart = 0;
+    bool m_firstTime = true;
     double m_prevPriceOfCoin {};
     void removeDots(std::string& response);
     void updateChart(std::string& response);
+
     void resetChart();
     void initDepositButton();
     void initExitButton();

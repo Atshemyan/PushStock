@@ -21,7 +21,6 @@ void LoginPage::loginButtonConnect()
         m_txtUser->setValidator(&mailValidator);
         m_txtPassword->setValidator(&passwordValidator);
 
-        // Use non-temporary QString variables for validation
         QString mail = m_txtUser->text();
         QString password = m_txtPassword->text();
 
@@ -45,7 +44,6 @@ void LoginPage::loginButtonConnect()
             LoginBuilder(m_txtUser->text().toStdString(), m_txtPassword->text().toStdString());
             if (Server::getInstance().responseFromServer() == "OK")
             {
-                //showing stockPage
                 m_stockPage = new StockPage(this, m_txtUser->text().toStdString());
                 m_stockPage->show();
             }
@@ -59,7 +57,7 @@ void LoginPage::loginButtonConnect()
         }
         else
         {
-            m_btnLogin->setStyleSheet("background-color: red; color: white;");  // Set button to red when declined.
+            m_btnLogin->setStyleSheet("background-color: red; color: white;");
         }
     });
 

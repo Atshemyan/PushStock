@@ -1,4 +1,6 @@
 #include "server.h"
+#include "getCryptoPrice.hpp"
+#include <iostream>
 
 Server::Server()
 {
@@ -8,15 +10,23 @@ Server::Server()
     openTransactionDataBase();
     listenAndDo();
 }
+
+void updateLocalCoinPrices() {
+
+}
 void Server::updateAllCoins()
 {
     while (!m_shouldTerminate)
-    {
-        for (auto &&i : m_coinVec)
-        {
-            i->editPrice();
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    {   
+
+        // m_btcPrice = "1";
+        // m_ethPrice = "2";
+        // m_bnbPrice = "3";
+
+        m_btcPrice = get_crypto_price("btc");
+        m_ethPrice = get_crypto_price("eth");
+        m_bnbPrice = get_crypto_price("bnb");
+        std::this_thread::sleep_for(std::chrono::milliseconds(5000));
     }
 
 }
@@ -31,8 +41,7 @@ double Server::getMoneyFromDB(const std::string& mail, sqlite3 *db)
     if (rc != SQLITE_OK)
     {
         std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(db) << std::endl;
-        // Handle the error as needed
-        return money; // Return 0.0 in case of an error
+        return money;
     }
 
     sqlite3_bind_text(moneyStmt, 1, mail.c_str(), -1, SQLITE_STATIC);
@@ -40,7 +49,7 @@ double Server::getMoneyFromDB(const std::string& mail, sqlite3 *db)
     rc = sqlite3_step(moneyStmt);
     if (rc == SQLITE_ROW)
     {
-        money = sqlite3_column_double(moneyStmt, 0); // Get the money balance from the query
+        money = sqlite3_column_double(moneyStmt, 0);
     }
 
     sqlite3_finalize(moneyStmt);
@@ -50,7 +59,6 @@ double Server::getMoneyFromDB(const std::string& mail, sqlite3 *db)
 
 double Server::getCoinCount(const std::string& username, sqlite3* db, const std::string& coinName)
 {
-    // Создаем SQL-запрос для получения количества монет в указанном слоте
     std::string selectCoinCountSQL = "SELECT " + coinName + " FROM client_information WHERE Mail = ?;";
     sqlite3_stmt* selectCoinCountStmt;
 
@@ -58,8 +66,7 @@ double Server::getCoinCount(const std::string& username, sqlite3* db, const std:
     if (rc != SQLITE_OK)
     {
         std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(db) << std::endl;
-        // Обработка ошибки по мере необходимости
-        return -1; // Возврат -1 как признак ошибки
+        return -1;
     }
 
     sqlite3_bind_text(selectCoinCountStmt, 1, username.c_str(), -1, SQLITE_STATIC);
@@ -67,32 +74,28 @@ double Server::getCoinCount(const std::string& username, sqlite3* db, const std:
     rc = sqlite3_step(selectCoinCountStmt);
     if (rc == SQLITE_ROW)
     {
-        // Получаем количество монет из результата запроса
         double coinCount = sqlite3_column_double(selectCoinCountStmt, 0);
         sqlite3_finalize(selectCoinCountStmt);
         return coinCount;
     }
     else
     {
-        // Пользователь не найден в базе данных или другая ошибка
         std::cerr << "Error getting coin count!" << std::endl;
         sqlite3_finalize(selectCoinCountStmt);
-        return -1; // Возврат -1 как признак ошибки
+        return -1; 
     }
 }
 
 
-void Server::updateCoinSlot(const std::string& username, sqlite3 *db, const std::string& coinName, double num, int index)
+void Server::updateCoinSlot(const std::string& username, sqlite3 *db, const std::string& coinName, double num)
 {    
-    // Создаем SQL-запрос для обновления значения в соответствующем столбце
-    std::string updateCoinSlotSQL = "UPDATE client_information SET " + m_coinVec[index]->getName() + " = ? WHERE Mail = ?;";
+    std::string updateCoinSlotSQL = "UPDATE client_information SET " + coinName + " = ? WHERE Mail = ?;";
     sqlite3_stmt* updateCoinSlotStmt;
 
     int rc = sqlite3_prepare_v2(db, updateCoinSlotSQL.c_str(), -1, &updateCoinSlotStmt, nullptr);
     if (rc != SQLITE_OK)
     {
         std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(db) << std::endl;
-        // Обработка ошибки по мере необходимости
         return;
     }
 
@@ -103,7 +106,6 @@ void Server::updateCoinSlot(const std::string& username, sqlite3 *db, const std:
     if (rc != SQLITE_DONE)
     {
         perror("Error executing SQL statement");
-        // Обработка ошибки по мере необходимости
     }
     sqlite3_finalize(updateCoinSlotStmt);
 }
@@ -117,7 +119,6 @@ void Server::setMoneyToDB(double newMoney, const std::string& mail, sqlite3* db)
     if (rc != SQLITE_OK)
     {
         std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(db) << std::endl;
-        // Handle the error as needed
         return;
     }
 
@@ -128,7 +129,6 @@ void Server::setMoneyToDB(double newMoney, const std::string& mail, sqlite3* db)
     if (rc != SQLITE_DONE)
     {
         perror("Error executing SQL statement");
-        // Handle the error as needed
     }
 
     sqlite3_finalize(updateMoneyStmt);
@@ -156,7 +156,7 @@ void Server::creatingSocket()
     }
 
     m_serverAddr.sin_family = AF_INET;
-    m_serverAddr.sin_port = htons(7778); // Choose a port
+    m_serverAddr.sin_port = htons(4444);
     m_serverAddr.sin_addr.s_addr = INADDR_ANY;
 
     if (bind(m_serverSocket, (struct sockaddr*)&m_serverAddr, sizeof(m_serverAddr)) == -1) {
@@ -164,7 +164,7 @@ void Server::creatingSocket()
         exit(EXIT_FAILURE);
     }
 
-    if (listen(m_serverSocket, 6) == -1) {
+    if (listen(m_serverSocket, 10) == -1) {
         perror("Error listening");
         exit(EXIT_FAILURE);
     }
@@ -205,29 +205,25 @@ void Server::listenAndDo()
 {
     while(true)
     {
-        // std::cout << "Listening! \n";
-        // Accept incoming client connections
-        clientSocket = accept(m_serverSocket, (struct sockaddr*)&m_clientAddr, &m_addrLen);
-        std::cout << "Client connected\n";
 
+        clientSocket = accept(m_serverSocket, (struct sockaddr*)&m_clientAddr, &m_addrLen);
+        
         if (clientSocket == -1) {
             perror("Error accepting client connection");
-            continue; // Continue listening for other connections
+            continue;
         }
 
         char buffer[1024];
         memset(buffer, 0, sizeof(buffer));
 
-        // Receive data from the connected client
         ssize_t bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
 
         if (bytesReceived == -1) {
             perror("Error receiving data");
             close(clientSocket);
-            continue; // Continue listening for other connections
+            continue;
         }
 
-        // Parse the received data
         std::string dataReceived(buffer);
         std::string delimiter = ";";
         size_t pos = 0;
@@ -241,10 +237,8 @@ void Server::listenAndDo()
             dataReceived.erase(0, pos + delimiter.length());
         }
 
-        // Extract individual parameters
         std::string operation = parameters[0];        
         
-        //commands
         if (operation == "REGISTER")
         {
             std::string name = parameters[1];
@@ -252,16 +246,14 @@ void Server::listenAndDo()
             std::string mail = parameters[3];
             std::string phoneNumber = parameters[4];
             std::string password = parameters[5];
-            std::cout << password << std::endl;
-            // Insert data into the SQLite database table
-            const char* insertSQL = "INSERT INTO client_information (Name, Surname, Phone, Mail, Password, Money, VHUK, HKE, NARSMOKE, VOYL) VALUES (?, ?, ?, ?, ?, 0, 0, 0 ,0, 0);";
+            const char* insertSQL = "INSERT INTO client_information (Name, Surname, Phone, Mail, Password, Money, BTC, ETH, BNB) VALUES (?, ?, ?, ?, ?, 0, 0, 0 ,0);";
             sqlite3_stmt* stmt;
 
             int rc = sqlite3_prepare_v2(m_db, insertSQL, -1, &stmt, nullptr);
             if (rc != SQLITE_OK) {
                 std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(m_db) << std::endl;
                 close(clientSocket);
-                continue; // Continue listening for other connections
+                continue;
             }
 
             sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_STATIC);
@@ -297,7 +289,7 @@ void Server::listenAndDo()
             {
                 std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(m_db) << std::endl;
                 close(clientSocket);
-                return; // Exit or handle the error as appropriate
+                return; 
             }
 
             sqlite3_bind_text(stmt, 1, username.c_str(), -1, SQLITE_STATIC);
@@ -306,13 +298,11 @@ void Server::listenAndDo()
             rc = sqlite3_step(stmt);
             if (rc == SQLITE_ROW)
             {
-                // Запись найдена в базе данных
                 std::cout << "Login successful!\n";
                 sendResponse(clientSocket, "OK");
             }
             else
             {
-                // Запись не найдена в базе данных
                 std::cout << "Login failed!\n";
                 sendResponse(clientSocket, "!OK");
             }
@@ -329,7 +319,7 @@ void Server::listenAndDo()
         else if (operation == "DEPOSIT")
         {
             std::string mail = parameters[1];
-            double depositAmount = std::stod(parameters[2]); // Преобразование строки в double
+            double depositAmount = std::stod(parameters[2]);
 
             double money = getMoneyFromDB(mail, m_db);
             if (depositAmount > 0)
@@ -345,29 +335,23 @@ void Server::listenAndDo()
            
         }
 
-        else if (operation == "GETVHUKPRICE")
+        else if (operation == "GETBTCPRICE")
         {
-            sendResponse(clientSocket, std::to_string(m_coinVec[0]->getPrice()).c_str());
+            sendResponse(clientSocket, m_btcPrice.c_str());
         }
 
-        else if (operation == "GETHKEPRICE")
+        else if (operation == "GETETHPRICE")
         {
-            sendResponse(clientSocket, std::to_string(m_coinVec[1]->getPrice()).c_str());
+            sendResponse(clientSocket, m_ethPrice.c_str());
         }
 
-        else if (operation == "GETNARSMOKEPRICE")
+        else if (operation == "GETBNBPRICE")
         {
-            sendResponse(clientSocket, std::to_string(m_coinVec[2]->getPrice()).c_str());
-        }
-
-        else if (operation == "GETVOYLPRICE")
-        {
-            sendResponse(clientSocket, std::to_string(m_coinVec[3]->getPrice()).c_str());
+            sendResponse(clientSocket, m_bnbPrice.c_str());
         }
 
         else if (operation == "BUY")
         {
-            
             std::string coinName = parameters[1];
             double purchaseAmount = std::stod(parameters[2]);
             std::string username = parameters[3];
@@ -375,17 +359,20 @@ void Server::listenAndDo()
             double money = getMoneyFromDB(username, m_db);
             money -= purchaseAmount;
             setMoneyToDB(money, username, m_db);
-            int index {-1};
-            for (int i = 0; i < m_coinVec.size(); ++i)
-            {
-                if (m_coinVec[i]->getName() == coinName)
-                {
-                    index = i;
-                }
-                
+            double price = -1;
+            int index = 0;
+            if (coinName == "BTC") {
+                price = std::stod(m_btcPrice);
             }
-            updateCoinSlot(username, m_db, coinName, purchaseAmount / m_coinVec[index]->getPrice(), index);
-            //connect to transactions db and set information there
+            else if (coinName == "ETH") {
+                price = std::stod(m_ethPrice);
+                index = 1;
+            }
+            else {
+                price = std::stod(m_bnbPrice);
+                index = 2;
+            }
+            updateCoinSlot(username, m_db, coinName, purchaseAmount / price);
             
             const char* insertSQL = "INSERT INTO transactions_information (username, coin, usdcoincount, price, buysell, date) VALUES (?, ?, ?, ?, ?, ?);";
             sqlite3_stmt* stmt;
@@ -394,13 +381,13 @@ void Server::listenAndDo()
             if (rc != SQLITE_OK) {
                 std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(m_db) << std::endl;
                 close(clientSocket);
-                continue; // Continue listening for other connections
+                continue;
             }
 
             sqlite3_bind_text(stmt, 1, username.c_str(), -1, SQLITE_STATIC);
             sqlite3_bind_text(stmt, 2, coinName.c_str(), -1, SQLITE_STATIC);
             sqlite3_bind_text(stmt, 3, std::to_string(purchaseAmount).c_str(), -1, SQLITE_STATIC);
-            sqlite3_bind_text(stmt, 4, std::to_string(m_coinVec[index]->getPrice()).c_str(), -1, SQLITE_STATIC);
+            sqlite3_bind_text(stmt, 4, std::to_string(price).c_str(), -1, SQLITE_STATIC);
             sqlite3_bind_text(stmt, 5, "BUY", -1, SQLITE_STATIC);
              std::time_t currentTime = std::time(nullptr);
 
@@ -432,21 +419,24 @@ void Server::listenAndDo()
             std::string username = parameters[3];
 
             
-            int index {-1};
-            for (int i = 0; i < m_coinVec.size(); ++i)
-            {
-                if (m_coinVec[i]->getName() == coinName)
-                {
-                    index = i;
-                }
-                
+            double price = -1;
+            int index = 0;
+            if (coinName == "BTC") {
+                price = std::stod(m_btcPrice);
+            }
+            else if (coinName == "ETH") {
+                price = std::stod(m_ethPrice);
+                index = 1;
+            }
+            else {
+                price = std::stod(m_bnbPrice);
+                index = 2;
             }
             double money = getMoneyFromDB(username, m_db);
-            money += coinSellCount * m_coinVec[index]->getPrice();
+            money += coinSellCount * price;
             setMoneyToDB(money, username, m_db);
             double coinCount = getCoinCount(username, m_db, coinName);
-            updateCoinSlot(username, m_db, coinName, coinCount - coinSellCount , index);
-             //connect to transactions db and set information there
+            updateCoinSlot(username, m_db, coinName, coinCount - coinSellCount);
             
             const char* insertSQL = "INSERT INTO transactions_information (username, coin, usdcoincount, price, buysell, date) VALUES (?, ?, ?, ?, ?, ?);";
             sqlite3_stmt* stmt;
@@ -455,13 +445,13 @@ void Server::listenAndDo()
             if (rc != SQLITE_OK) {
                 std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(m_db) << std::endl;
                 close(clientSocket);
-                continue; // Continue listening for other connections
+                continue;
             }
 
             sqlite3_bind_text(stmt, 1, username.c_str(), -1, SQLITE_STATIC);
             sqlite3_bind_text(stmt, 2, coinName.c_str(), -1, SQLITE_STATIC);
             sqlite3_bind_text(stmt, 3, std::to_string(coinCount).c_str(), -1, SQLITE_STATIC);
-            sqlite3_bind_text(stmt, 4, std::to_string(m_coinVec[index]->getPrice()).c_str(), -1, SQLITE_STATIC);
+            sqlite3_bind_text(stmt, 4, std::to_string(price).c_str(), -1, SQLITE_STATIC);
             sqlite3_bind_text(stmt, 5, "SELL", -1, SQLITE_STATIC);
              std::time_t currentTime = std::time(nullptr);
 
@@ -486,21 +476,19 @@ void Server::listenAndDo()
 
         }
 
-        else if (operation == "GETCOUNT") // all coins count in account
+        else if (operation == "GETCOUNT")
         {
             std::string username = parameters[1];
             std::string message;
-            for (int i = 0; i < m_coinVec.size(); ++i)
-            {
-                message += m_coinVec[i]->getName() + ": ";
-                message += std::to_string(getCoinCount(username, m_db, m_coinVec[i]->getName())) + "  ";
-            }
+
+            message +=  "  BTC: " + std::to_string(getCoinCount(username, m_db, "BTC"));
+            message +=  "  ETH: " + std::to_string(getCoinCount(username, m_db, "ETH"));
+            message +=  "  BNB: " + std::to_string(getCoinCount(username, m_db, "BNB"));
             sendResponse(clientSocket, message.c_str());
         }
 
-        else if (operation == "GETCOINCOUNT") //only 1(selected) coin count
+        else if (operation == "GETCOINCOUNT")
         {
-            // Server::getInstance().sendCommandToServer("GETCOINCOUNT;" + m_currentUserUsername + ';' + m_coinsSelection->currentText() + ';');
             std::string username = parameters[1];
             std::string coinName = parameters[2];
             std::string message = std::to_string(getCoinCount(username, m_db, coinName));
@@ -518,49 +506,43 @@ void Server::listenAndDo()
             if (rc != SQLITE_OK)
             {
                 std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(m_transactionDb) << std::endl;
-                // Handle the error as needed
             }
 
             unsigned int lineCounter {};
 
             while ((rc = sqlite3_step(transactionsStmt)) == SQLITE_ROW)
             {
-                // Concatenate all fields for each transaction
                 for (int col = 0; col < sqlite3_column_count(transactionsStmt); ++col)
                 {
                     const char* value = reinterpret_cast<const char*>(sqlite3_column_text(transactionsStmt, col));
                     transactions += value;
                     transactions += ' ';
                 }
-                // Add a newline character to separate transactions
                 transactions += ";";
                 ++lineCounter;
             }
             
             if (lineCounter >= 15)
             {
-                // Remove the oldest transaction
                 const char* deleteOldestTransactionSQL = "DELETE FROM transactions_information WHERE date = (SELECT MIN(date) FROM transactions_information);";
 
                 int deleteRc = sqlite3_exec(m_transactionDb, deleteOldestTransactionSQL, nullptr, nullptr, nullptr);
                 if (deleteRc != SQLITE_OK)
                 {
                     std::cerr << "Error deleting the oldest transaction: " << sqlite3_errmsg(m_transactionDb) << std::endl;
-                    // Handle the error as needed
                 }
             }
             
             if (rc != SQLITE_DONE)
             {
                 std::cerr << "Error executing SQL statement" << std::endl;
-                // Handle the error as needed
             }
             sqlite3_finalize(transactionsStmt);
             sendResponse(clientSocket, transactions.c_str());
 
         }
 
-        close(clientSocket); // Close the client socket when done processing
+        close(clientSocket);
 
     }
 }
