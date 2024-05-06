@@ -31,9 +31,10 @@ class StockPage : public QWidget
 {
 
 public:
-    StockPage(QWidget *parent = nullptr, const std::string& username = "NONE");
+    StockPage(QWidget *parent = nullptr, const std::string& username = "NONE", uint languageIndex = 0);
 private:
     QComboBox *m_coinsSelection {};
+    uint m_languageIndex = 0;
     QLabel *m_moneyToShow {};
     QPushButton *m_btnDeposit {};
     QPushButton *m_btnExit {};

@@ -19,7 +19,7 @@
 class LoginPage : public QWidget
 {
 public:
-    LoginPage(QWidget* parent = nullptr);
+    LoginPage(QWidget* parent = nullptr, uint languageIndex = 0);
 private:
     QPushButton *m_btnBack {};
     QLineEdit *m_txtUser {};
@@ -29,6 +29,7 @@ private:
     QLabel *m_topLabel {};
     QLabel *m_logoLabel {};
     QSize m_parentSize = parentWidget()->size();
+    uint m_languageIndex = 0;
 
     void pageHeader();
     void pageLogo();

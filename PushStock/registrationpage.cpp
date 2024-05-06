@@ -1,8 +1,9 @@
 #include "registrationpage.h"
 #include "server.h"
 
-RegistrationPage::RegistrationPage(QWidget *parent)
+RegistrationPage::RegistrationPage(QWidget *parent, uint languageIndex)
     : QWidget{parent}
+    , m_languageIndex {languageIndex}
 {
     m_size = parentWidget()->size();
     this->setGeometry(10, 10, m_size.width(), m_size.height());
@@ -22,7 +23,7 @@ void RegistrationPage::pageHeader()
     QLabel *topLabel = new QLabel(this);
     topLabel->setGeometry(0, 0, m_size.width(), 30);
     m_btnBack = new QPushButton(topLabel);
-    m_btnBack->setText("← Back");
+    m_btnBack->setText(m_languageIndex ? "← Back" : "← Հետ");
     m_btnBack->setStyleSheet("QPushButton { background: transparent; color: white; }"
                             "QPushButton:hover { color: rgb(241, 180, 41); }");
     m_btnBack->setGeometry(0, 0, 65, 30);
@@ -44,19 +45,23 @@ void RegistrationPage::pageRegister()
     QLabel *textLabel = new QLabel(this);
 
     QLabel *nameLabel= new QLabel(textLabel);
-    nameLabel->setText("Name:");
+    nameLabel->setText(!m_languageIndex ? "Անուն:" : "Name");
 
     QLabel *surnameLabel= new QLabel(textLabel);
-    surnameLabel->setText("Surname:");
+    surnameLabel->setText(!m_languageIndex ? "Ազգանուն" : "Surname");
 
     QLabel *phoneLabel= new QLabel(textLabel);
-    phoneLabel->setText("Phone:");
+    phoneLabel->setText(!m_languageIndex ? "Հեռախոսահամար" : "Phone");
+
 
     QLabel *mailLabel= new QLabel(textLabel);
-    mailLabel->setText("E-mail:");
+    mailLabel->setText(!m_languageIndex ? "Էլ-հասցե" : "E-mail");
+
 
     QLabel *passwordLabel = new QLabel(textLabel);
     passwordLabel->setText("password:");
+    passwordLabel->setText(!m_languageIndex ? "Գաղտնաբառ" : "Password");
+
 
     //line edits and register button
     m_txtName = new QLineEdit(textLabel);
@@ -66,7 +71,7 @@ void RegistrationPage::pageRegister()
     m_txtUser = new QLineEdit(textLabel);
     m_txtPassword = new QLineEdit(textLabel);
     m_btnReg = new QPushButton(textLabel);
-    m_btnReg->setText("Register →");
+    m_btnReg->setText(!m_languageIndex ? "Գրանցվել →" : "Register →");
     m_btnReg->setStyleSheet("QPushButton { background: transparent; color: white; }"
                               "QPushButton:hover { color: rgb(241, 180, 41); }");
 

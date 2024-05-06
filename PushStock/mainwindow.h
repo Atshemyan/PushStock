@@ -11,6 +11,8 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QMainWindow>
+#include <QComboBox>
+
 #include "loginpage.h"
 #include "registrationpage.h"
 
@@ -19,6 +21,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
 private:
+    QVBoxLayout *m_bodyLayout {};
     QVBoxLayout *m_mainLayout {};
     QHBoxLayout *m_buttonLayout {};
     QPushButton *m_btnLogin {};
@@ -26,6 +29,8 @@ private:
     QLabel *m_imageLabel {};
     LoginPage *m_loginPage {};
     RegistrationPage *m_registrationPage {};
+    QHBoxLayout *m_header {};
+    QComboBox *m_languageSelection {};
     void setDarkTheme();
     void showLoginPage();
     void showRegistrationPage();

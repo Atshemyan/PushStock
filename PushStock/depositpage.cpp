@@ -1,8 +1,9 @@
 #include "depositpage.h"
 
-DepositPage::DepositPage(QWidget *parent, const std::string& useranme)
+DepositPage::DepositPage(QWidget *parent, const std::string& useranme, uint languageIndex)
     : QWidget {parent}
     , m_currentUserName {useranme}
+    , m_languageIndex {languageIndex}
 {
     m_size = parentWidget()->size();
     this->setGeometry(0, 0, m_size.width(), m_size.height());
@@ -18,7 +19,7 @@ void DepositPage::pageHeader()
     QLabel *topLabel = new QLabel(this);
     topLabel->setGeometry(10, 10, m_size.width(), 30);
     m_btnBack = new QPushButton(topLabel);
-    m_btnBack->setText("← Back");
+    m_btnBack->setText(!m_languageIndex ? "← Հետ" : "← Back");
     m_btnBack->setStyleSheet("QPushButton { background: transparent; color: white; }"
                             "QPushButton:hover { color: rgb(241, 180, 41); }");
     m_btnBack->setGeometry(0, 0, 65, 30);
@@ -68,7 +69,7 @@ void DepositPage::depositOpportunity()
     m_txtMoney->setGeometry(0, 30, 300, 23);
     m_btnDeposit = new QPushButton(depositLabel);
     m_btnDeposit->setGeometry(0, 60, 300, 35);
-    m_btnDeposit->setText("Deposit");
+    m_btnDeposit->setText(!m_languageIndex ? "Համալրել հաշիվը" : "Deposit");
     m_btnDeposit->setStyleSheet("QPushButton {"
                                 "background-color: darkorange;"
                                 "color: white;"

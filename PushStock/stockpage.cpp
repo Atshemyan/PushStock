@@ -1,8 +1,9 @@
 #include "stockpage.h"
 
-StockPage::StockPage(QWidget *parent, const std::string& username)
+StockPage::StockPage(QWidget *parent, const std::string& username, uint languageIndex)
     : QWidget {parent}
     , m_currentUserUsername {username}
+    , m_languageIndex {languageIndex}
 {
     m_size = parentWidget()->size();
     this->setGeometry(0, 0, m_size.width(), m_size.height());
@@ -35,7 +36,7 @@ void StockPage::initBotButtons()
     m_btnBuy = new QPushButton(m_botLabel);
     m_btnBuy->setGeometry(m_botLabel->width() - (140 + 140 + 60), 5, 140, 40);
 
-    m_btnBuy->setText("Buy");
+    m_btnBuy->setText(!m_languageIndex ? "Գնել" : "Buy");
     m_btnBuy->setStyleSheet(
         "QPushButton {"
         "   background-color: #008000; /* Green */"
@@ -50,7 +51,7 @@ void StockPage::initBotButtons()
 
     m_btnSell = new QPushButton(m_botLabel);
     m_btnSell->setGeometry(m_botLabel->width() - 170, 5, 140, 40);
-    m_btnSell->setText("Sell");
+    m_btnSell->setText(!m_languageIndex ? "Վաճառել" : "Sell");
     m_btnSell->setStyleSheet(
         "QPushButton {"
         "   background-color: #8B0000; /* Dark Red */"
@@ -195,13 +196,13 @@ void StockPage::settingCoinPrice()
 void StockPage::priceGraphic()
 {
     connect(m_priceThread, &CoinPriceThread::updatePrice, this, &StockPage::settingCoinPrice);
-    m_priceThread->continueThread(); // as start
+    m_priceThread->continueThread();
 }
 
 void StockPage::initExitButton()
 {
     m_btnExit = new QPushButton(m_topLabel);
-    m_btnExit->setText("Exit →");
+    m_btnExit->setText(!m_languageIndex ? "Ելք →" : "Exit →");
     m_btnExit->setGeometry(m_size.width() - 170, 0, 140, 40);
     m_btnExit->setStyleSheet("QPushButton { background: transparent; color: white; }"
                              "QPushButton:hover { color: rgb(241, 180, 41); }");
@@ -214,7 +215,7 @@ void StockPage::initExitButton()
 void StockPage::initDepositButton()
 {
     m_btnDeposit = new QPushButton(m_topLabel);
-    m_btnDeposit->setText("Deposit");
+    m_btnDeposit->setText(!m_languageIndex ? "Համալրել հաշիվը" : "Deposit");
     m_btnDeposit->setGeometry(m_size.width() - (140 + 140 + 60), 0, 140, 40);
     m_btnDeposit->setStyleSheet("QPushButton {"
                                 "background-color: darkorange;"
@@ -225,7 +226,7 @@ void StockPage::initDepositButton()
                                 "}");
     QObject::connect(m_btnDeposit, &QPushButton::clicked, [&]()
     {
-        m_depositPage = new DepositPage(this, m_currentUserUsername);
+        m_depositPage = new DepositPage(this, m_currentUserUsername, m_languageIndex);
         m_depositPage->show();
     });
 }
@@ -347,14 +348,14 @@ void StockPage::updateChart(std::string& response)
     m_priceChart->axes(Qt::Horizontal).first()->setRange(currentTime.addSecs(-100).toMSecsSinceEpoch(), currentTime.toMSecsSinceEpoch());
 
     if (m_firstTime) {
-        m_minValueOfChart = price - 40;
-        m_maxValueOfChart = price + 40;
+        m_minValueOfChart = price - 150;
+        m_maxValueOfChart = price + 150;
         m_firstTime = false;
     }
 
     else if (abs(price - m_maxValueOfChart) <= 10 || abs(price - m_minValueOfChart) <= 10) {
-        m_minValueOfChart = price - 40;
-        m_maxValueOfChart = price + 40;
+        m_minValueOfChart = price - 150;
+        m_maxValueOfChart = price + 150;
     }
 
     m_priceChart->axes(Qt::Vertical).first()->setRange(m_minValueOfChart, m_maxValueOfChart);
