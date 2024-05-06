@@ -90,6 +90,8 @@ To successfully build and run the program, ensure you have the following require
 ## Disclaimer
 This program is for educational and emulation purposes only. The cryptocurrencies mentioned are virtual and have no real-world value. Please use responsibly.
 ---
+g++ -std=c++20 server.cpp main.cpp -l sqlite3 -lcurl -o server && ./server --> for server
 
 Thank you for choosing **PushStock** for your stock management needs. Happy trading! 📊🚀
 Report: https://bit.ly/48NIEy2
+
